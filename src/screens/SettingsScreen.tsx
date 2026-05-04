@@ -3,18 +3,38 @@
  * 使用 Zustand 管理设置状态（与主包共享）
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, Switch, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, Switch, StatusBar, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { useAppStore } from '../store/useAppStore';
+import { checkForUpdate } from '../services/ApkUpdateService';
+import Toast, { ToastRef } from '../components/Toast';
 
 type SettingsScreenProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 export default function SettingsScreen({ navigation }: SettingsScreenProps) {
-  // 使用 Zustand 全局状态（与主包共享！）
-  const { darkMode, notifications, setDarkMode, setNotifications } = useAppStore();
+  const { darkMode, notifications, setDarkMode, setNotifications, setApkUpdateInfo } = useAppStore();
+  const [checkingUpdate, setCheckingUpdate] = React.useState(false);
+  const toastRef = useRef<ToastRef>(null);
+
+  const handleCheckUpdate = async () => {
+    setCheckingUpdate(true);
+    try {
+      //更新app地址
+      const updateInfo = await checkForUpdate('http://192.168.5.67:8080/app/update');
+      if (updateInfo) {
+        setApkUpdateInfo(updateInfo);
+      } else {
+        toastRef.current?.show({ type: 'success', message: '已是最新版本', duration: 2000 });
+      }
+    } catch {
+      toastRef.current?.show({ type: 'error', message: '检查更新失败，请稍后重试', duration: 2000 });
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
 
   return (
     <View style={[styles.container, darkMode && styles.darkContainer]}>
@@ -71,8 +91,22 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
               <MaterialIcons name="info" size={24} color="#10b981" />
               <Text style={[styles.settingLabel, darkMode && styles.darkText]}>版本号</Text>
             </View>
-            <Text style={[styles.settingValue, darkMode && styles.darkText]}>1.0.0</Text>
+            <Text style={[styles.settingValue, darkMode && styles.darkText]}>1.0.5</Text>
           </View>
+
+          <View style={[styles.divider, darkMode && styles.darkDivider]} />
+
+          <TouchableOpacity style={styles.settingItem} onPress={handleCheckUpdate} disabled={checkingUpdate}>
+            <View style={styles.settingInfo}>
+              <MaterialIcons name="system-update-alt" size={24} color="#135bec" />
+              <Text style={[styles.settingLabel, darkMode && styles.darkText]}>检查更新</Text>
+            </View>
+            {checkingUpdate ? (
+              <ActivityIndicator size="small" color="#135bec" />
+            ) : (
+              <MaterialIcons name="chevron-right" size={20} color="#94a3b8" />
+            )}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.hintContainer}>
@@ -81,6 +115,7 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
           </Text>
         </View>
       </ScrollView>
+      <Toast ref={toastRef} />
     </View>
   );
 }

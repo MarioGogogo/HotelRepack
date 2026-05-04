@@ -40,6 +40,18 @@ interface ModuleUpdateInfo {
   isUpdateAvailable: boolean;
 }
 
+// APK 更新信息类型
+interface ApkUpdateInfo {
+  versionName: string;
+  versionCode: number;
+  downloadUrl: string;
+  changelog: string;
+  forceUpdate: boolean;
+  fileSize: number;
+}
+
+type ApkDownloadState = 'idle' | 'downloading' | 'downloaded' | 'error';
+
 // Store 状态类型
 interface AppState {
   // 用户认证（持久化）
@@ -62,6 +74,13 @@ interface AppState {
   pendingUpdate: ModuleUpdateInfo | null;
   isCheckingUpdate: boolean;
 
+  // APK 更新（不持久化）
+  apkUpdateInfo: ApkUpdateInfo | null;
+  apkDownloadProgress: number;
+  apkDownloadState: ApkDownloadState;
+  apkDownloadError: string | null;
+  apkFilePath: string | null;
+
   // Actions
   login: (token: string, user: User) => void;
   logout: () => void;
@@ -72,6 +91,14 @@ interface AppState {
   setBundleConfigs: (configs: BundleConfig[]) => void;
   setPendingUpdate: (update: ModuleUpdateInfo | null) => void;
   setCheckingUpdate: (checking: boolean) => void;
+
+  // APK 更新 actions
+  setApkUpdateInfo: (info: ApkUpdateInfo | null) => void;
+  setApkDownloadProgress: (progress: number) => void;
+  setApkDownloadState: (state: ApkDownloadState) => void;
+  setApkDownloadError: (error: string | null) => void;
+  setApkFilePath: (path: string | null) => void;
+  resetApkUpdate: () => void;
 }
 
 // 创建带持久化的 Store
@@ -89,6 +116,11 @@ export const useAppStore = create<AppState>()(
       bundleConfigUpdated: null,
       pendingUpdate: null,
       isCheckingUpdate: false,
+      apkUpdateInfo: null,
+      apkDownloadProgress: 0,
+      apkDownloadState: 'idle' as ApkDownloadState,
+      apkDownloadError: null,
+      apkFilePath: null,
 
       // 登录
       login: (token, user) => set({
@@ -125,6 +157,20 @@ export const useAppStore = create<AppState>()(
 
       // 设置检查更新状态
       setCheckingUpdate: (checking) => set({ isCheckingUpdate: checking }),
+
+      // APK 更新 actions
+      setApkUpdateInfo: (info) => set({ apkUpdateInfo: info }),
+      setApkDownloadProgress: (progress) => set({ apkDownloadProgress: progress }),
+      setApkDownloadState: (downloadState) => set({ apkDownloadState: downloadState }),
+      setApkDownloadError: (error) => set({ apkDownloadError: error }),
+      setApkFilePath: (path) => set({ apkFilePath: path }),
+      resetApkUpdate: () => set({
+        apkUpdateInfo: null,
+        apkDownloadProgress: 0,
+        apkDownloadState: 'idle' as ApkDownloadState,
+        apkDownloadError: null,
+        apkFilePath: null,
+      }),
     }),
     {
       name: 'native-router-storage', // AsyncStorage 中的 key

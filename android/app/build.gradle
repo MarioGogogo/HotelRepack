@@ -82,8 +82,8 @@ android {
         applicationId "com.hotelrepack"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10005
-        versionName "1.0.5"
+        versionCode 10006
+        versionName "1.0.6"
     }
     signingConfigs {
         debug {
@@ -126,6 +126,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
 
     if (hermesEnabled.toBoolean()) {

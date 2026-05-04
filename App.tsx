@@ -4,12 +4,18 @@
  * @format
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import RootNavigator from './src/navigation/RootNavigator';
+import ApkUpdateModal from './src/components/ApkUpdateModal';
+import { initApkUpdateListeners } from './src/services/ApkUpdateService';
 
 function App(): React.JSX.Element {
+  useEffect(() => {
+    initApkUpdateListeners();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer
@@ -28,6 +34,7 @@ function App(): React.JSX.Element {
       >
         <RootNavigator />
       </NavigationContainer>
+      <ApkUpdateModal />
     </SafeAreaProvider>
   );
 }
