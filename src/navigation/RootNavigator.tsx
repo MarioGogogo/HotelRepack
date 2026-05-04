@@ -1,8 +1,8 @@
 /**
- * 根导航器 - 包含登录页、Tab 导航和分包页面
+ * 根导航器 - 包含登录页、首页和分包页面
  *
  * 起始页：LoginScreen（登录页面）
- * 主包：TabNavigator
+ * 首页：HomeScreen（九宫格）
  * 分包：SettingsScreen（生产环境）/ 主包（开发环境）
  */
 
@@ -18,8 +18,6 @@ import ChunkErrorBoundary from '../components/ChunkErrorBoundary';
 import LoginScreen from '../screens/LoginScreen';
 // 新的主页（九宫格）
 import HomeScreen from '../screens/HomeScreen';
-// 主包：Tab 导航
-import TabNavigator from './TabNavigator';
 
 // 分包页面：开发模式主包，生产模式分包
 const HotelReservationScreen = __DEV__
@@ -41,18 +39,6 @@ const HotelDiningScreen = __DEV__
 const SettingsScreen = __DEV__
   ? require('../screens/SettingsScreen').default
   : React.lazy(() => import(/* webpackChunkName: "settings" */ '../screens/SettingsScreen'));
-
-const ShopScreen = __DEV__
-  ? require('../screens/ShopScreen').default
-  : React.lazy(() => import(/* webpackChunkName: "shop" */ '../screens/ShopScreen'));
-
-const FeatureScreen = __DEV__
-  ? require('../screens/FeatureScreen').default
-  : React.lazy(() => import(/* webpackChunkName: "feature" */ '../screens/FeatureScreen'));
-
-const UpdateScreen = __DEV__
-  ? require('../screens/UpdateTestScreen').default
-  : React.lazy(() => import(/* webpackChunkName: "update" */ '../screens/UpdateTestScreen'));
 
 // 分包加载状态
 function ChunkLoader() {
@@ -78,15 +64,11 @@ function ChunkScreenWrapper({ component: Component, ...props }: { component: Rea
 export type RootStackParamList = {
   Login: undefined;
   Home: undefined;
-  MainTabs: undefined;
   HotelReservation: undefined;
   ReservationDetail: { roomId: string };
   HotelCleaning: undefined;
   HotelDining: undefined;
   Settings: undefined;
-  shop: undefined;
-  feature: undefined;
-  update: undefined;
   BundleError: { bundleName: string };
 };
 
@@ -219,14 +201,8 @@ export default function RootNavigator() {
       {/* 餐饮服务 */}
       <Stack.Screen name="HotelDining" component={(props: any) => <ChunkScreenWrapper component={HotelDiningScreen} {...props} />} />
 
-      {/* 主包：Tab 导航（底部Tab栏切换不使用push动画） */}
-      <Stack.Screen name="MainTabs" component={TabNavigator} />
-
       {/* 分包页面：开发模式主包，生产模式分包（使用iOS push动画） */}
       <Stack.Screen name="Settings" component={(props: any) => <ChunkScreenWrapper component={SettingsScreen} {...props} />} />
-      <Stack.Screen name="shop" component={(props: any) => <ChunkScreenWrapper component={ShopScreen} {...props} />} />
-      <Stack.Screen name="feature" component={(props: any) => <ChunkScreenWrapper component={FeatureScreen} {...props} />} />
-      <Stack.Screen name="update" component={(props: any) => <ChunkScreenWrapper component={UpdateScreen} {...props} />} />
 
       {/* 分包错误页面 */}
       <Stack.Screen name="BundleError" component={BundleErrorScreen} />

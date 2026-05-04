@@ -1,30 +1,33 @@
-# HotelRepack - React Native 代码分割实践
+# HotelRepack - React Native 酒店管理系统
 
-基于 React Native 0.83 + Re.Pack 的模块化分包示例项目，演示如何实现远程代码加载和动态更新。
-
-![主界面](sceen.png)
+基于 React Native 0.83 + Re.Pack 的酒店管理移动应用，实现远程代码加载和动态更新。
 
 ## 技术栈
 
 | 技术 | 用途 |
 |------|------|
-| React Native 0.83.0 | 跨平台移动开发框架 |
+| React Native 0.83.1 | 跨平台移动开发框架 |
 | TypeScript 5.0 | 类型安全 |
 | @callstack/repack 5.2.3 | 代码分割与远程加载 |
 | Zustand | 轻量级状态管理 |
+| react-native-reanimated 4.2.1 | 高性能动画 |
+| React Navigation 7.x | 导航路由 |
 
 ## 架构概览
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                      App.tsx                        │
-│  ┌─────────────┐    ┌─────────────────────────────┐ │
-│  │  HomeScreen │───▶│ ChunkErrorBoundary          │ │
-│  └─────────────┘    │ ┌─────────────────────────┐ │ │
-│                     │ │ Suspense → Screen       │ │ │
-│                     │ │ (动态加载的分包)         │ │ │
-│                     │ └─────────────────────────┘ │ │
-│                     └─────────────────────────────┘ │
+│  ┌──────────────┐   ┌────────────────────────────┐  │
+│  │ LoginScreen  │──▶│ HomeScreen（九宫格首页）    │  │
+│  └──────────────┘   └─────────────┬──────────────┘  │
+│                                   │                  │
+│                     ┌─────────────┴──────────────┐   │
+│                     │ ChunkErrorBoundary         │   │
+│                     │ ┌────────────────────────┐ │   │
+│                     │ │ Suspense → 分包页面     │ │   │
+│                     │ └────────────────────────┘ │   │
+│                     └────────────────────────────┘   │
 └─────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -45,11 +48,10 @@
 
 | 分包名称 | 加载路径 | 功能 |
 |----------|----------|------|
-| feature | `src/screens/FeatureScreen.tsx` | 功能演示页 |
-| settings | `src/screens/SettingsScreen.tsx` | 设置页 |
-| profile | `src/screens/ProfileScreen.tsx` | 个人页 |
-| shop | `src/screens/ShopScreen.tsx` | 商城页（带购物车状态共享） |
-| update | `src/screens/UpdateTestScreen.tsx` | 更新测试页 |
+| hotel-reservation | `src/screens/HotelReservation/` | 客房预订（房型浏览、预订下单） |
+| hotel-cleaning | `src/screens/HotelCleaning/` | 客房打扫（任务管理、状态流转） |
+| hotel-dining | `src/screens/HotelDining/` | 餐饮服务（菜单浏览、购物车下单） |
+| settings | `src/screens/SettingsScreen.tsx` | 酒店设置页 |
 
 ## 核心实现
 
@@ -108,9 +110,10 @@ interface UpdateDialogProps {
 ```typescript
 // useAppStore.ts
 interface AppState {
-  cartCount: number;
-  addToCart: () => void;
-  clearCart: () => void;
+  isLoggedIn: boolean;
+  user: User | null;
+  token: string | null;
+  bundleConfigs: BundleConfig[];
   pendingUpdate: ModuleUpdateInfo | null;
   setPendingUpdate: (update: ModuleUpdateInfo | null) => void;
 }
@@ -141,8 +144,9 @@ npm run bundle:android:chunk
 # 构建 iOS 分包
 npm run bundle:ios
 
-# 构建主包（Release）
-npm run bundle:android
+# 构建 Android APK
+npm run build:android        # release
+npm run build-android:debug  # debug
 ```
 
 ## 远程部署
@@ -155,12 +159,20 @@ npm run bundle:android
 
 ```json
 {
-  "shop": {
-    "url": "https://your-server.com/shop.chunk.bundle",
+  "hotel-reservation": {
+    "url": "https://your-server.com/hotel-reservation.chunk.bundle",
     "version": "1.1.0"
   },
-  "feature": {
-    "url": "https://your-server.com/feature.chunk.bundle",
+  "hotel-cleaning": {
+    "url": "https://your-server.com/hotel-cleaning.chunk.bundle",
+    "version": "1.0.0"
+  },
+  "hotel-dining": {
+    "url": "https://your-server.com/hotel-dining.chunk.bundle",
+    "version": "1.0.0"
+  },
+  "settings": {
+    "url": "https://your-server.com/settings.chunk.bundle",
     "version": "1.0.0"
   }
 }
@@ -195,22 +207,38 @@ npm run bundle:android
 
 ```
 HotelRepack/
-├── index.js                    # 入口文件，Re.Pack 配置
-├── App.tsx                     # 主应用，路由与动画
+├── index.js                        # 入口文件，Re.Pack ScriptManager 配置
+├── App.tsx                         # 主应用，SafeAreaProvider + NavigationContainer
 ├── src/
 │   ├── components/
-│   │   ├── BackButton.tsx      # 返回按钮
+│   │   ├── BackButton.tsx          # 返回按钮
 │   │   ├── ChunkErrorBoundary.tsx  # 分包加载错误边界
-│   │   └── UpdateDialog.tsx    # 更新提示弹窗
+│   │   ├── Dialog.tsx              # 通用对话框
+│   │   ├── Toast.tsx               # 轻提示
+│   │   └── UpdateDialog.tsx        # 分包更新提示弹窗
+│   ├── navigation/
+│   │   └── RootNavigator.tsx       # 根导航器（登录→首页→分包页面）
 │   ├── screens/
-│   │   ├── HomeScreen.tsx      # 首页
-│   │   ├── FeatureScreen.tsx   # 功能分包
-│   │   ├── SettingsScreen.tsx  # 设置分包
-│   │   ├── ProfileScreen.tsx   # 个人分包
-│   │   ├── ShopScreen.tsx      # 商城分包
-│   │   └── UpdateTestScreen.tsx # 更新测试页
+│   │   ├── LoginScreen.tsx         # 登录页
+│   │   ├── HomeScreen.tsx          # 九宫格首页
+│   │   ├── SettingsScreen.tsx      # 设置页
+│   │   ├── HotelReservation/       # 客房预订模块
+│   │   │   ├── index.tsx           # 房型列表页
+│   │   │   ├── DetailPage.tsx      # 预订详情页
+│   │   │   ├── mockData.ts         # 模拟数据
+│   │   │   └── components/         # SearchBar, CategorySidebar, RoomCard 等
+│   │   ├── HotelCleaning/          # 客房打扫模块
+│   │   │   ├── index.tsx           # 任务列表页
+│   │   │   ├── mockData.ts         # 模拟数据
+│   │   │   └── components/         # StatusTabs, StatsBar, TaskCard 等
+│   │   └── HotelDining/            # 餐饮服务模块
+│   │       ├── index.tsx           # 菜单列表页
+│   │       ├── mockData.ts         # 模拟数据
+│   │       └── components/         # CategoryScroll, MenuItemCard, CartButton 等
+│   ├── services/
+│   │   └── BundleConfigService.ts  # 云端分包配置获取
 │   └── store/
-│       └── useAppStore.ts      # Zustand 状态管理
+│       └── useAppStore.ts          # Zustand 状态管理（持久化）
 └── package.json
 ```
 
@@ -232,11 +260,10 @@ HotelRepack/
 
 ### Q: 如何测试版本更新？
 
-1. 在商城页面添加/修改内容
+1. 在酒店模块中添加/修改内容
 2. 升级版本号
 3. 重新构建分包并上传
-4. 在 App 中进入商城，点击刷新
-5. 观察更新弹窗，点击更新
+4. 在 App 中进入对应模块，观察更新提示
 
 ## License
 
