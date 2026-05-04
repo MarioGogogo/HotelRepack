@@ -18,6 +18,7 @@ export interface ApkUpdateInfo {
 }
 
 interface CheckUpdateResponse {
+  success:boolean;
   code: number;
   data: {
     hasUpdate: boolean;
