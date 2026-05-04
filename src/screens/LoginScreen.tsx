@@ -20,7 +20,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  ZoomIn,
+  SlideInDown,
+  SlideOutDown,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -124,7 +125,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           </Animated.View>
 
           {/* Centered Form Card - Light Theme */}
-          <Animated.View entering={ZoomIn.duration(700).springify().damping(20).stiffness(90)} style={styles.form}>
+          <Animated.View entering={FadeIn.duration(600).delay(200)} style={styles.form}>
             
             <Text style={styles.welcomeText}>员工登录</Text>
 
@@ -253,9 +254,13 @@ function HotelPicker({ hotels, selected, onSelect, onClose }: HotelPickerProps) 
   return (
     <View style={pickerStyles.overlay}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={pickerStyles.backdrop} />
+        <Animated.View style={pickerStyles.backdrop} entering={FadeIn.duration(200)} exiting={FadeIn.duration(200)} />
       </TouchableWithoutFeedback>
-      <Animated.View entering={ZoomIn.duration(300).springify().damping(20).stiffness(90)} style={pickerStyles.modalCard}>
+      <Animated.View
+        entering={SlideInDown.duration(350).springify().damping(30).stiffness(120)}
+        exiting={SlideOutDown.duration(300)}
+        style={pickerStyles.modalCard}
+      >
         <View style={pickerStyles.modalInner}>
           {/* Header */}
           <View style={pickerStyles.header}>
@@ -469,10 +474,8 @@ const pickerStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    justifyContent: 'flex-end',
     zIndex: 100,
-    paddingHorizontal: 24, 
   },
   backdrop: {
     position: 'absolute',

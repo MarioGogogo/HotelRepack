@@ -88,15 +88,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: 16,
     padding: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#1B2A4A',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-      },
-      android: { elevation: 3 },
-    }),
   },
   imagePlaceholder: {
     width: 110,

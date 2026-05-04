@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, withDelay, Easing } from 'react-native-reanimated';
 import type { MenuItem } from '../mockData';
 
 const COLORS = {
@@ -28,7 +28,17 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, index, quantity, onAd
   const onPressOut = useCallback(() => { addScale.value = withSpring(1); }, []);
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 40).springify()}>
+    <Animated.View entering={() => {
+      'worklet';
+      const d = index * 50;
+      return {
+        initialValues: { opacity: 0, transform: [{ scale: 0.7 }] },
+        animations: {
+          opacity: withDelay(d, withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) })),
+          transform: [{ scale: withDelay(d, withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) })) }],
+        },
+      };
+    }}>
       <View style={styles.card}>
         {/* 图片占位 */}
         <View style={[styles.imageBlock, { backgroundColor: item.imageColor }]}>
@@ -97,15 +107,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: 14,
     padding: 10,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#1E293B',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-      },
-      android: { elevation: 2 },
-    }),
   },
   imageBlock: {
     width: 80,

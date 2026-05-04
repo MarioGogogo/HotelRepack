@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, withDelay, Easing } from 'react-native-reanimated';
 import type { CleaningTask, CleaningStatus } from '../mockData';
 
 const STATUS_CONFIG: Record<CleaningStatus, { label: string; color: string; bg: string; icon: string }> = {
@@ -46,7 +46,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, onStatusChange }) => {
   const onPressOut = useCallback(() => { scale.value = withSpring(1); }, []);
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
+    <Animated.View entering={() => {
+      'worklet';
+      const d = index * 50;
+      return {
+        initialValues: { opacity: 0, transform: [{ scale: 0.7 }] },
+        animations: {
+          opacity: withDelay(d, withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) })),
+          transform: [{ scale: withDelay(d, withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) })) }],
+        },
+      };
+    }}>
       <View style={styles.card}>
         {/* 顶部：房号 + 状态 */}
         <View style={styles.topRow}>
@@ -127,15 +137,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#1E293B',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-      },
-      android: { elevation: 2 },
-    }),
   },
   topRow: {
     flexDirection: 'row',

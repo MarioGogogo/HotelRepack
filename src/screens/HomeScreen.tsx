@@ -12,11 +12,13 @@ import {
   Image,
 } from 'react-native';
 import Animated, {
-  FadeInDown,
   FadeIn,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
+  withDelay,
+  Easing,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -56,10 +58,20 @@ function GridItem({ item, index, onPress, hasUpdate }: { item: typeof MODULES[0]
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(100 + index * 50)
-        .duration(600)
-        .springify()
-        .damping(18)}
+      entering={() => {
+        'worklet';
+        const delayMs = 100 + index * 60;
+        return {
+          initialValues: {
+            opacity: 0,
+            transform: [{ scale: 0.6 }],
+          },
+          animations: {
+            opacity: withDelay(delayMs, withTiming(1, { duration: 450, easing: Easing.out(Easing.cubic) })),
+            transform: [{ scale: withDelay(delayMs, withTiming(1, { duration: 450, easing: Easing.out(Easing.cubic) })) }],
+          },
+        };
+      }}
       style={[animatedStyle, { width: ITEM_WIDTH, marginBottom: SPACING }]}
     >
       <TouchableOpacity
@@ -247,11 +259,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
-    shadowColor: '#1B2A4A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 5,
   },
   gridItemInner: {
     flex: 1,

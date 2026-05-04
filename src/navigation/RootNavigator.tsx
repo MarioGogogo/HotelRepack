@@ -64,12 +64,12 @@ function ChunkLoader() {
 }
 
 // 分包页面包装器：带错误边界 + Suspense
-function ChunkScreenWrapper({ component: Component }: { component: React.ComponentType<any> }) {
+function ChunkScreenWrapper({ component: Component, ...props }: { component: React.ComponentType<any> }) {
   const navigation = useNavigation<any>();
   return (
     <ChunkErrorBoundary onGoBack={() => navigation.goBack()}>
       <Suspense fallback={<ChunkLoader />}>
-        <Component />
+        <Component {...props} />
       </Suspense>
     </ChunkErrorBoundary>
   );
@@ -210,23 +210,23 @@ export default function RootNavigator() {
       <Stack.Screen name="Home" component={HomeScreen} />
 
       {/* 客房预订 */}
-      <Stack.Screen name="HotelReservation" component={() => <ChunkScreenWrapper component={HotelReservationScreen} />} />
-      <Stack.Screen name="ReservationDetail" component={() => <ChunkScreenWrapper component={ReservationDetailScreen} />} />
+      <Stack.Screen name="HotelReservation" component={(props: any) => <ChunkScreenWrapper component={HotelReservationScreen} {...props} />} />
+      <Stack.Screen name="ReservationDetail" component={(props: any) => <ChunkScreenWrapper component={ReservationDetailScreen} {...props} />} />
 
       {/* 客房打扫 */}
-      <Stack.Screen name="HotelCleaning" component={() => <ChunkScreenWrapper component={HotelCleaningScreen} />} />
+      <Stack.Screen name="HotelCleaning" component={(props: any) => <ChunkScreenWrapper component={HotelCleaningScreen} {...props} />} />
 
       {/* 餐饮服务 */}
-      <Stack.Screen name="HotelDining" component={() => <ChunkScreenWrapper component={HotelDiningScreen} />} />
+      <Stack.Screen name="HotelDining" component={(props: any) => <ChunkScreenWrapper component={HotelDiningScreen} {...props} />} />
 
       {/* 主包：Tab 导航（底部Tab栏切换不使用push动画） */}
       <Stack.Screen name="MainTabs" component={TabNavigator} />
 
       {/* 分包页面：开发模式主包，生产模式分包（使用iOS push动画） */}
-      <Stack.Screen name="Settings" component={() => <ChunkScreenWrapper component={SettingsScreen} />} />
-      <Stack.Screen name="shop" component={() => <ChunkScreenWrapper component={ShopScreen} />} />
-      <Stack.Screen name="feature" component={() => <ChunkScreenWrapper component={FeatureScreen} />} />
-      <Stack.Screen name="update" component={() => <ChunkScreenWrapper component={UpdateScreen} />} />
+      <Stack.Screen name="Settings" component={(props: any) => <ChunkScreenWrapper component={SettingsScreen} {...props} />} />
+      <Stack.Screen name="shop" component={(props: any) => <ChunkScreenWrapper component={ShopScreen} {...props} />} />
+      <Stack.Screen name="feature" component={(props: any) => <ChunkScreenWrapper component={FeatureScreen} {...props} />} />
+      <Stack.Screen name="update" component={(props: any) => <ChunkScreenWrapper component={UpdateScreen} {...props} />} />
 
       {/* 分包错误页面 */}
       <Stack.Screen name="BundleError" component={BundleErrorScreen} />
