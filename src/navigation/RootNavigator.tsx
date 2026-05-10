@@ -18,6 +18,14 @@ import ChunkErrorBoundary from '../components/ChunkErrorBoundary';
 import LoginScreen from '../screens/LoginScreen';
 // 新的主页（九宫格）
 import HomeScreen from '../screens/HomeScreen';
+import WarrantyList from '../screens/Warranty/WarrantyList';
+import WarrantyEquipment from '../screens/Warranty/WarrantyEquipment';
+import WarrantySubmit from '../screens/Warranty/WarrantySubmit';
+import WarrantySuccess from '../screens/Warranty/WarrantySuccess';
+import WarrantyDetail from '../screens/Warranty/WarrantyDetail';
+import FinanceDashboard from '../screens/Finance/FinanceDashboard';
+import FinanceRevenue from '../screens/Finance/FinanceRevenue';
+import FinanceTransactions from '../screens/Finance/FinanceTransactions';
 
 // 分包页面：开发模式主包，生产模式分包
 const HotelReservationScreen = __DEV__
@@ -70,6 +78,14 @@ export type RootStackParamList = {
   HotelDining: undefined;
   Settings: undefined;
   BundleError: { bundleName: string };
+  Warranty: undefined;
+  WarrantyEquipment: undefined;
+  WarrantySubmit: { category?: string };
+  WarrantySuccess: undefined;
+  WarrantyDetail: { id?: string };
+  Finance: undefined;
+  FinanceRevenue: undefined;
+  FinanceTransactions: undefined;
 };
 
 // 分包错误页面组件
@@ -187,6 +203,18 @@ export default function RootNavigator() {
           headerShown: false,
         }}
       />
+
+      {/* 设备保修 */}
+      <Stack.Screen name="Warranty" component={WarrantyList} />
+      <Stack.Screen name="WarrantyEquipment" component={WarrantyEquipment} />
+      <Stack.Screen name="WarrantySubmit" component={WarrantySubmit} />
+      <Stack.Screen name="WarrantySuccess" component={WarrantySuccess} />
+      <Stack.Screen name="WarrantyDetail" component={WarrantyDetail} />
+
+      {/* 财务报表 */}
+      <Stack.Screen name="Finance" component={FinanceDashboard} />
+      <Stack.Screen name="FinanceRevenue" component={FinanceRevenue} />
+      <Stack.Screen name="FinanceTransactions" component={FinanceTransactions} />
 
       {/* 九宫格首页 */}
       <Stack.Screen name="Home" component={HomeScreen} />

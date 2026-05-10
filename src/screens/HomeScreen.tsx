@@ -35,9 +35,9 @@ const MODULES = [
   { id: '2', name: '客房打扫', icon: 'cleaning-services', route: 'HotelCleaning', chunkName: 'hotel-cleaning' },
   { id: '3', name: '餐饮服务', icon: 'restaurant', route: 'HotelDining', chunkName: 'hotel-dining' },
   { id: '4', name: '酒店设置', icon: 'settings', route: 'Settings', chunkName: 'settings' },
-  { id: '5', name: '设备报修', icon: 'build', route: null },
+  { id: '5', name: '设备报修', icon: 'build', route: 'Warranty' },
   { id: '6', name: '前台接待', icon: 'support-agent', route: null },
-  { id: '7', name: '财务报表', icon: 'bar-chart', route: null },
+  { id: '7', name: '财务报表', icon: 'bar-chart', route: 'Finance' },
   { id: '8', name: '库存管理', icon: 'inventory', route: null },
   { id: '9', name: '员工排班', icon: 'event-note', route: null },
 ];

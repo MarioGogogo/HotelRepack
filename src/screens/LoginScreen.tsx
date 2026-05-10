@@ -29,6 +29,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppStore } from '../store/useAppStore';
 import { fetchBundleConfigWithRetry } from '../services/BundleConfigService';
 import { updateRemoteBundleConfig } from '../../index';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -52,8 +53,8 @@ const HOTELS = [
 ];
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
-  const [employeeId, setEmployeeId] = useState('');
-  const [password, setPassword] = useState('');
+  const [employeeId, setEmployeeId] = useState('admin');
+  const [password, setPassword] = useState('123456');
   const [selectedHotel, setSelectedHotel] = useState<(typeof HOTELS)[0] | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -76,7 +77,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     setLoading(true);
 
     setTimeout(() => {
-      setLoading(false);
+      if (employeeId !== 'admin' || password !== '123456') {
+        setLoading(false);
+        return;
+      }
       login('mock-token-123', {
         name: employeeId,
         level: 1,
@@ -88,6 +92,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       fetchBundleConfigWithRetry()
         .then((config) => updateRemoteBundleConfig(config))
         .catch(console.warn);
+      setLoading(false);
     }, 1500);
   }, [employeeId, password, selectedHotel, login, navigation]);
 
@@ -251,6 +256,7 @@ interface HotelPickerProps {
 }
 
 function HotelPicker({ hotels, selected, onSelect, onClose }: HotelPickerProps) {
+  const insets = useSafeAreaInsets();
   return (
     <View style={pickerStyles.overlay}>
       <TouchableWithoutFeedback onPress={onClose}>
@@ -261,7 +267,7 @@ function HotelPicker({ hotels, selected, onSelect, onClose }: HotelPickerProps) 
         exiting={SlideOutDown.duration(300)}
         style={pickerStyles.modalCard}
       >
-        <View style={pickerStyles.modalInner}>
+        <View style={[pickerStyles.modalInner, { paddingBottom: insets.bottom + 24 }]}>
           {/* Header */}
           <View style={pickerStyles.header}>
             <Text style={pickerStyles.title}>选择所在酒店</Text>
@@ -523,6 +529,7 @@ const pickerStyles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingTop: 12,
+    paddingBottom: 40,
   },
   item: {
     flexDirection: 'row',
