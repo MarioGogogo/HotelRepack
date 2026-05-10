@@ -84,6 +84,14 @@ const DEFAULT_CONFIG: Record<string, { url: string; version: string }> = {
     url: 'https://gitee.com/webcc/doudizhu/releases/download/v1.1/feature.chunk.bundle',
     version: 'v1.1',
   },
+  warranty: {
+    url: 'https://gitee.com/webcc/doudizhu/releases/download/v1.0/warranty.chunk.bundle',
+    version: 'v1.0',
+  },
+  finance: {
+    url: 'https://gitee.com/webcc/doudizhu/releases/download/v1.0/finance.chunk.bundle',
+    version: 'v1.0',
+  },
 };
 
 /**

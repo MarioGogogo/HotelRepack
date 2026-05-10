@@ -18,14 +18,6 @@ import ChunkErrorBoundary from '../components/ChunkErrorBoundary';
 import LoginScreen from '../screens/LoginScreen';
 // 新的主页（九宫格）
 import HomeScreen from '../screens/HomeScreen';
-import WarrantyList from '../screens/Warranty/WarrantyList';
-import WarrantyEquipment from '../screens/Warranty/WarrantyEquipment';
-import WarrantySubmit from '../screens/Warranty/WarrantySubmit';
-import WarrantySuccess from '../screens/Warranty/WarrantySuccess';
-import WarrantyDetail from '../screens/Warranty/WarrantyDetail';
-import FinanceDashboard from '../screens/Finance/FinanceDashboard';
-import FinanceRevenue from '../screens/Finance/FinanceRevenue';
-import FinanceTransactions from '../screens/Finance/FinanceTransactions';
 
 // 分包页面：开发模式主包，生产模式分包
 const HotelReservationScreen = __DEV__
@@ -47,6 +39,40 @@ const HotelDiningScreen = __DEV__
 const SettingsScreen = __DEV__
   ? require('../screens/SettingsScreen').default
   : React.lazy(() => import(/* webpackChunkName: "settings" */ '../screens/SettingsScreen'));
+
+// 保修模块分包
+const WarrantyListScreen = __DEV__
+  ? require('../screens/Warranty/WarrantyList').default
+  : React.lazy(() => import(/* webpackChunkName: "warranty" */ '../screens/Warranty/WarrantyList'));
+
+const WarrantyEquipmentScreen = __DEV__
+  ? require('../screens/Warranty/WarrantyEquipment').default
+  : React.lazy(() => import(/* webpackChunkName: "warranty" */ '../screens/Warranty/WarrantyEquipment'));
+
+const WarrantySubmitScreen = __DEV__
+  ? require('../screens/Warranty/WarrantySubmit').default
+  : React.lazy(() => import(/* webpackChunkName: "warranty" */ '../screens/Warranty/WarrantySubmit'));
+
+const WarrantySuccessScreen = __DEV__
+  ? require('../screens/Warranty/WarrantySuccess').default
+  : React.lazy(() => import(/* webpackChunkName: "warranty" */ '../screens/Warranty/WarrantySuccess'));
+
+const WarrantyDetailScreen = __DEV__
+  ? require('../screens/Warranty/WarrantyDetail').default
+  : React.lazy(() => import(/* webpackChunkName: "warranty" */ '../screens/Warranty/WarrantyDetail'));
+
+// 财务报表分包
+const FinanceDashboardScreen = __DEV__
+  ? require('../screens/Finance/FinanceDashboard').default
+  : React.lazy(() => import(/* webpackChunkName: "finance" */ '../screens/Finance/FinanceDashboard'));
+
+const FinanceRevenueScreen = __DEV__
+  ? require('../screens/Finance/FinanceRevenue').default
+  : React.lazy(() => import(/* webpackChunkName: "finance" */ '../screens/Finance/FinanceRevenue'));
+
+const FinanceTransactionsScreen = __DEV__
+  ? require('../screens/Finance/FinanceTransactions').default
+  : React.lazy(() => import(/* webpackChunkName: "finance" */ '../screens/Finance/FinanceTransactions'));
 
 // 分包加载状态
 function ChunkLoader() {
@@ -205,16 +231,16 @@ export default function RootNavigator() {
       />
 
       {/* 设备保修 */}
-      <Stack.Screen name="Warranty" component={WarrantyList} />
-      <Stack.Screen name="WarrantyEquipment" component={WarrantyEquipment} />
-      <Stack.Screen name="WarrantySubmit" component={WarrantySubmit} />
-      <Stack.Screen name="WarrantySuccess" component={WarrantySuccess} />
-      <Stack.Screen name="WarrantyDetail" component={WarrantyDetail} />
+      <Stack.Screen name="Warranty" component={(props: any) => <ChunkScreenWrapper component={WarrantyListScreen} {...props} />} />
+      <Stack.Screen name="WarrantyEquipment" component={(props: any) => <ChunkScreenWrapper component={WarrantyEquipmentScreen} {...props} />} />
+      <Stack.Screen name="WarrantySubmit" component={(props: any) => <ChunkScreenWrapper component={WarrantySubmitScreen} {...props} />} />
+      <Stack.Screen name="WarrantySuccess" component={(props: any) => <ChunkScreenWrapper component={WarrantySuccessScreen} {...props} />} />
+      <Stack.Screen name="WarrantyDetail" component={(props: any) => <ChunkScreenWrapper component={WarrantyDetailScreen} {...props} />} />
 
       {/* 财务报表 */}
-      <Stack.Screen name="Finance" component={FinanceDashboard} />
-      <Stack.Screen name="FinanceRevenue" component={FinanceRevenue} />
-      <Stack.Screen name="FinanceTransactions" component={FinanceTransactions} />
+      <Stack.Screen name="Finance" component={(props: any) => <ChunkScreenWrapper component={FinanceDashboardScreen} {...props} />} />
+      <Stack.Screen name="FinanceRevenue" component={(props: any) => <ChunkScreenWrapper component={FinanceRevenueScreen} {...props} />} />
+      <Stack.Screen name="FinanceTransactions" component={(props: any) => <ChunkScreenWrapper component={FinanceTransactionsScreen} {...props} />} />
 
       {/* 九宫格首页 */}
       <Stack.Screen name="Home" component={HomeScreen} />
