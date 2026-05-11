@@ -42,7 +42,7 @@ echo ""
 # Step 1: 清理旧的打包文件
 echo -e "${GREEN}[1/5] 清理旧的 bundle 文件...${NC}"
 rm -rf android/app/src/main/assets/*.bundle*
-rm -rf build/output
+rm -rf build/outputs
 mkdir -p android/app/src/main/assets
 
 # Step 2: 打包 JS Bundle
@@ -87,7 +87,7 @@ elif [ "$BUILD_TYPE" = "debug" ]; then
 else
     echo -e "${YELLOW}  Release 模式：使用 Re.Pack webpack (支持远程代码分割)${NC}"
     # 使用 Re.Pack 的 webpack-bundle 命令构建主包和远程分包
-    # 远程分包会输出到 build/output/android/remote/ 目录
+    # 远程分包会输出到 build/outputs/android/remotes/ 目录
     NODE_ENV=production npx react-native webpack-bundle \
         --entry-file index.js \
         --platform android \
@@ -110,8 +110,8 @@ fi
 
 echo ""
 echo -e "${YELLOW}远程分包输出:${NC}"
-if [ -d "build/output/android/remote" ]; then
-    find build/output/android/remote -name "*.bundle" 2>/dev/null | while read file; do
+if [ -d "build/outputs/android/remotes" ]; then
+    find build/outputs/android/remotes -name "*.bundle" 2>/dev/null | while read file; do
         echo "  $(basename "$file"): $(ls -lh "$file" | awk '{print $5}')"
     done
 else

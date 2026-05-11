@@ -29,6 +29,10 @@ export default Repack.defineRspackConfig({
   resolve: {
     ...Repack.getResolveOptions(),
   },
+  optimization: {
+    // 禁用自动 vendor 分包，第三方依赖会合入引用它的业务模块
+    splitChunks: false,
+  },
   module: {
     rules: [
       {
@@ -51,37 +55,37 @@ export default Repack.defineRspackConfig({
         {
           include: /hotel-reservation/,
           type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
+          outputPath: path.join(__dirname, 'build/outputs/android/remotes'),
         },
         {
           include: /hotel-cleaning/,
           type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
+          outputPath: path.join(__dirname, 'build/outputs/android/remotes'),
         },
         {
           include: /hotel-dining/,
           type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
-        },
-        {
-          include: /feature/,
-          type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
+          outputPath: path.join(__dirname, 'build/outputs/android/remotes'),
         },
         {
           include: /settings/,
           type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
+          outputPath: path.join(__dirname, 'build/outputs/android/remotes'),
         },
         {
-          include: /shop/,
+          include: /warranty/,
           type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
+          outputPath: path.join(__dirname, 'build/outputs/android/remotes'),
         },
         {
-          include: /update/,
+          include: /finance/,
           type: 'remote',
-          outputPath: path.join(__dirname, 'build/output/android/remote'),
+          outputPath: path.join(__dirname, 'build/outputs/android/remotes'),
+        },
+        {
+          // 兜底规则：未匹配的 vendor/async chunk 作为 local 处理
+          include: /.*/,
+          type: 'local',
         },
       ],
     }),

@@ -1,6 +1,6 @@
 {
   "name": "HotelRepack",
-  "version": "1.0.7",
+  "version": "1.0.13",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -9,7 +9,7 @@
     "start": "react-native webpack-start",
     "start:metro": "react-native start",
     "test": "jest",
-    "build:android": "./scripts/build-android.sh release",
+    "build:android": "./scripts/build-android-repack.sh release",
     "build:android:debug": "./scripts/build-android.sh debug"
   },
   "dependencies": {

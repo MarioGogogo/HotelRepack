@@ -208,7 +208,7 @@ print_step 1 5 "清理旧的构建文件"
 print_substep "删除旧 bundle 文件..."
 rm -rf android/app/src/main/assets/*.bundle* 2>/dev/null || true
 rm -rf android/app/build/generated/assets/react/release/* 2>/dev/null || true
-rm -rf build/output 2>/dev/null || true
+rm -rf build/outputs 2>/dev/null || true
 print_success "旧文件已清理"
 
 print_substep "创建输出目录..."
@@ -244,6 +244,28 @@ fi
 print_success "JavaScript Bundle 打包完成"
 
 # ============================================
+# Step 2.5: 分离远程分包（从主包目录剪切到独立输出目录）
+# ============================================
+print_info "分离远程分包..."
+REMOTE_OUTPUT_DIR="build/outputs/android/remotes"
+mkdir -p "$REMOTE_OUTPUT_DIR"
+
+BUNDLE_DIR="android/app/build/generated/assets/react/release"
+CHUNK_MOVED=0
+for chunk_file in "$BUNDLE_DIR"/*.chunk.bundle; do
+    [ -f "$chunk_file" ] || continue
+    mv "$chunk_file" "$REMOTE_OUTPUT_DIR/"
+    CHUNK_MOVED=$((CHUNK_MOVED + 1))
+done
+rm -f "$BUNDLE_DIR"/*.chunk.bundle.map 2>/dev/null || true
+
+if [ $CHUNK_MOVED -gt 0 ]; then
+    print_success "已将 $CHUNK_MOVED 个远程分包移至 $REMOTE_OUTPUT_DIR/"
+else
+    print_info "未发现分包文件（可能所有代码在主包中）"
+fi
+
+# ============================================
 # Step 3: 检查打包结果
 # ============================================
 print_step 3 5 "检查打包结果"
@@ -264,10 +286,10 @@ else
 fi
 
 # 检查分包
-CHUNK_COUNT=$(find build/output -name "*.chunk.bundle" 2>/dev/null | wc -l | tr -d ' ')
+CHUNK_COUNT=$(find build/outputs/android/remotes -name "*.chunk.bundle" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$CHUNK_COUNT" -gt 0 ]; then
     print_success "分包数量: ${BOLD}$CHUNK_COUNT${NC} 个"
-    find build/output -name "*.chunk.bundle" 2>/dev/null | while read file; do
+    find build/outputs/android/remotes -name "*.chunk.bundle" 2>/dev/null | while read file; do
         CHUNK_NAME=$(basename "$file")
         CHUNK_SIZE=$(ls -lh "$file" | awk '{print $5}')
         echo -e "      ${DIM}└─${NC} $CHUNK_NAME (${YELLOW}$CHUNK_SIZE${NC})"
